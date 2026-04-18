@@ -20,9 +20,12 @@ public class S3FileUploadService {
     @Value("${aws.bucket}")
     private String bucket;
 
+    @Value("${aws.folder}")
+    private String s3Folder;
+
     public String upload(MultipartFile file) throws IOException {
 
-        String key = "resume-builder/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String key = s3Folder + UUID.randomUUID() + "-" + file.getOriginalFilename();
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -36,6 +39,6 @@ public class S3FileUploadService {
     }
 
     private String getFileUrl(String key) {
-        return "https://" + bucket + ".s3.ap-south-1.amazonaws.com/" + key;
+        return s3Client.utilities().getUrl(builder -> builder.bucket(bucket).key(key)).toExternalForm();
     }
 }
