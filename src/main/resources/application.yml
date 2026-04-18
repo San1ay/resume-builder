@@ -19,5 +19,12 @@ spring:
 app:
   base:
     url: ${BASE_URL}
+
 cloundinary:
   uri: cloudinary://${CLOUDINARY_API_KEY}:${CLOUDINARY_API_SECRET}@${CLOUDINARY_CLOUD_NAME}
+
+aws:
+  accessKey: ${AWS_ACCESS_KEY}
+  secretKey: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  bucket: ${AWS_BUCKET}
