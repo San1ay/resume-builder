@@ -3,6 +3,7 @@ package com.hisanjay.resumebuilderapi.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.hisanjay.resumebuilderapi.document.User;
@@ -19,6 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthService {
     private final UserRepository userRepository;
+    private final EmailService emailService;
+
+    @Value("${app.base.url}")
+    private String appBaseUrl;
 
     public AuthRespone register(RegisterRequest request) {
         log.info("inside AuthSerive: register() {}", request);
@@ -29,10 +34,58 @@ public class AuthService {
         User newUser = toDocument(request);
         userRepository.save(newUser);
 
-        // TODO; Send email
+        // sendVerificationEmail(newUser);
 
         return toResponse(newUser);
 
+    }
+
+    public void verifyEmail(String verificationToken) {
+        User user = userRepository.findByVerificationToken(verificationToken)
+                .orElseThrow(() -> new RuntimeException("Verificaton Token Invalid or expired"));
+
+        if (user != null && user.getVerificationExpires().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Verifcation Token is expired. Please request new token");
+        }
+        user.setEmailVerified(true);
+        user.setVerificationToken(null);
+        user.setVerificationExpires(null);
+        userRepository.save(user);
+
+    }
+
+    private void sendVerificationEmail(User newUser) {
+        try {
+            String link = appBaseUrl + "/api/auth/verify-email?token=" + newUser.getVerificationToken();
+            String html = """
+                    <table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;">
+                      <tr>
+                        <td>
+                          <p>Hi <strong>{{USER_NAME}}</strong>,</p>
+                          <p>Please verify your email by clicking below:</p>
+
+                          <a href="{{VERIFY_LINK}}"
+                             style="display:inline-block;padding:10px 16px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">
+                             Verify Email
+                          </a>
+
+                          <p style="font-size:12px;margin-top:15px;">
+                            Or use this link:<br/>
+                            <a href="{{VERIFY_LINK}}">{{VERIFY_LINK}}</a>
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+
+                                        """
+                    .replace("{{USER_NAME}}", newUser.getName())
+                    .replace("{{VERIFY_LINK}}", link);
+            emailService.sendHtmlEmail(newUser.getEmail(), "Verify Your Email", html);
+
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            throw new RuntimeException("Failed to send Verification Email: " + e.getMessage());
+        }
     }
 
     private User toDocument(RegisterRequest request) {

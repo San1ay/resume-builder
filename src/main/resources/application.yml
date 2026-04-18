@@ -1,0 +1,21 @@
+spring:
+  mongodb:
+    uri: ${MONGO_URI}
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    from: ${MAIL_FROM}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        
+app:
+  base:
+    url: ${BASE_URL}

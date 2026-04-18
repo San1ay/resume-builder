@@ -16,6 +16,8 @@ import com.hisanjay.resumebuilderapi.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @Slf4j
@@ -30,6 +32,12 @@ public class AuthController {
         AuthRespone response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Email verified Sucessfully"));
     }
 
 }
