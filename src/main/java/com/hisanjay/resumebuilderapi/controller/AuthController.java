@@ -49,6 +49,11 @@ public class AuthController {
         return ResponseEntity.ok(respone);
     }
 
+    // @GetMapping("/validate")
+    // public String getMethodName() {
+    // return new String("Token Validation is working");
+    // }
+
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {
         authService.verifyEmail(token);

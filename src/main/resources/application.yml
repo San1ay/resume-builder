@@ -30,3 +30,7 @@ aws:
   region: ${AWS_REGION}
   bucket: ${AWS_BUCKET}
   folder: ${AWS_FOLDER}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
