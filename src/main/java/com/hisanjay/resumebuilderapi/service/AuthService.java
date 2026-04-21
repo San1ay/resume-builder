@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class AuthService {
         User newUser = toDocument(request);
         userRepository.save(newUser);
 
-        // sendVerificationEmail(newUser);
+        sendVerificationEmail(newUser);
 
         return toResponse(newUser);
 
@@ -48,14 +49,14 @@ public class AuthService {
 
     public AuthRespone login(LoginRequest request) {
         User existingUser = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new UsernameNotFoundException("Invalid Email or Password"));
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Email or Password"));
 
         // Fix: matches(raw, encoded)
         if (!passwordEncoder.matches(request.getPassword(), existingUser.getPassword())) {
             throw new UsernameNotFoundException("Invalid Email or Password");
         }
 
-        if (!existingUser.getEmailVerified()) {
+        if (!existingUser.isEmailVerified()) {
             throw new RuntimeException("Please Verify Email before logging in.");
         }
 
@@ -124,8 +125,26 @@ public class AuthService {
 
     private AuthRespone toResponse(User newUser) {
         return AuthRespone.builder().id(newUser.getId()).name(newUser.getName()).email(newUser.getEmail())
-                .profileImageUrl(newUser.getProfileImageUrl()).emailVerified(newUser.getEmailVerified())
+                .profileImageUrl(newUser.getProfileImageUrl()).emailVerified(newUser.isEmailVerified())
                 .subscriptionPlan(newUser.getSubscriptionPlan()).createdAt(newUser.getCreatedAt())
                 .updatedAt(newUser.getUpdatedAt()).build();
+    }
+
+    public void resendVerification(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isEmailVerified()) {
+            throw new RuntimeException("Email is already verified.");
+        }
+        user.setVerificationToken(UUID.randomUUID().toString());
+        user.setVerificationExpires(LocalDateTime.now().plusHours(24));
+        userRepository.save(user);
+
+        sendVerificationEmail(user);
+    }
+
+    public AuthRespone getProfile(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return toResponse(user);
     }
 }

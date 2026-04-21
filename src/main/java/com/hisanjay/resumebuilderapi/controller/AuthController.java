@@ -2,10 +2,12 @@ package com.hisanjay.resumebuilderapi.controller;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +55,24 @@ public class AuthController {
     // public String getMethodName() {
     // return new String("Token Validation is working");
     // }
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(Authentication authentication) {
+        AuthRespone response = authService.getProfile(authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<?> resendVerification(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+
+        if (Objects.isNull(email)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is Required"));
+        }
+
+        authService.resendVerification(email);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Verification Email Sent."));
+    }
 
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {

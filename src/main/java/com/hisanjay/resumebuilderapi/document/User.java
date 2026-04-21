@@ -25,7 +25,7 @@ public class User {
     @Builder.Default
     private String subscriptionPlan = "basic";
     @Builder.Default
-    private Boolean emailVerified = false;
+    private boolean emailVerified = false;
     private String verificationToken;
     private LocalDateTime verificationExpires;
 
