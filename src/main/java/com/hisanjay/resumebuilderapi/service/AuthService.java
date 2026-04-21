@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.hisanjay.resumebuilderapi.document.User;
 import com.hisanjay.resumebuilderapi.dto.AuthRespone;
+import com.hisanjay.resumebuilderapi.dto.LoginRequest;
 import com.hisanjay.resumebuilderapi.dto.RegisterRequest;
 import com.hisanjay.resumebuilderapi.exception.ResourceExistsException;
 import com.hisanjay.resumebuilderapi.repository.UserRepository;
@@ -21,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService {
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.base.url}")
     private String appBaseUrl;
@@ -38,6 +42,24 @@ public class AuthService {
 
         return toResponse(newUser);
 
+    }
+
+    public AuthRespone login(LoginRequest request) {
+        User existingUser = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Email or Password"));
+
+        if (!passwordEncoder.matches(existingUser.getPassword(), request.getPassword())) {
+            throw new UsernameNotFoundException("Invalid Email or Password");
+        }
+
+        if (!existingUser.getEmailVerified()) {
+            throw new RuntimeException("Please Verify Email before logging in.");
+        }
+
+        String token = "jwtToken";
+        AuthRespone response = toResponse(existingUser);
+        response.setToken(token);
+        return response;
     }
 
     public void verifyEmail(String verificationToken) {
@@ -90,7 +112,8 @@ public class AuthService {
 
     private User toDocument(RegisterRequest request) {
         return User.builder()
-                .name(request.getName()).email(request.getEmail()).password(request.getPassword())
+                .name(request.getName()).email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .profileImageUrl(request.getProfileImageUrl()).emailVerified(false).subscriptionPlan("Basic")
                 .verificationToken(UUID.randomUUID().toString()).verificationExpires(LocalDateTime.now().plusHours(24))
                 .build();

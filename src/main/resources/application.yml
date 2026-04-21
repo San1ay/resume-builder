@@ -19,6 +19,7 @@ spring:
 app:
   base:
     url: ${BASE_URL}
+  corsOrigins: ${CORS_ORIGINS}
 
 cloundinary:
   uri: cloudinary://${CLOUDINARY_API_KEY}:${CLOUDINARY_API_SECRET}@${CLOUDINARY_CLOUD_NAME}

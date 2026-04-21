@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.hisanjay.resumebuilderapi.dto.AuthRespone;
+import com.hisanjay.resumebuilderapi.dto.LoginRequest;
 import com.hisanjay.resumebuilderapi.dto.RegisterRequest;
 import com.hisanjay.resumebuilderapi.service.AuthService;
 import com.hisanjay.resumebuilderapi.service.FileUploadService;
@@ -40,6 +41,12 @@ public class AuthController {
         AuthRespone response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+        AuthRespone respone = authService.login(loginRequest);
+        return ResponseEntity.ok(respone);
     }
 
     @GetMapping("/verify-email")
