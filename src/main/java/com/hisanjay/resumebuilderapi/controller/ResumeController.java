@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hisanjay.resumebuilderapi.dto.CreateResumeRequest;
 import com.hisanjay.resumebuilderapi.model.Resume;
-import com.hisanjay.resumebuilderapi.service.FileUploadService;
+import com.hisanjay.resumebuilderapi.service.FileUploaderService;
 import com.hisanjay.resumebuilderapi.service.ResumeService;
 import com.hisanjay.resumebuilderapi.utils.Constants;
 
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ResumeController {
     private final ResumeService resumeService;
-    private final FileUploadService fileUploadService;
+    private final FileUploaderService fileUploaderService;
 
     @PostMapping
     public ResponseEntity<?> createResume(@Valid @RequestBody CreateResumeRequest createResumeRequest,
@@ -69,10 +69,10 @@ public class ResumeController {
 
     @PutMapping(Constants.RESUME_UPLOAD_IMAGES_ENDPOINT)
     public ResponseEntity<?> uploadResumeImage(@PathVariable String id,
-            @RequestPart(value = "thumbail", required = true) MultipartFile thumbnail,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             HttpServletRequest request, Authentication authentication) throws IOException {
-        Map<String, String> response = fileUploadService.uploadResumeImages(id, authentication, thumbnail,
+        Map<String, String> response = fileUploaderService.uploadResumeImages(id, authentication, thumbnail,
                 profileImage);
         return ResponseEntity.ok(response);
 

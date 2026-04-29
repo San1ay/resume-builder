@@ -1,6 +1,7 @@
 package com.hisanjay.resumebuilderapi.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,9 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.hisanjay.resumebuilderapi.dto.AuthRespone;
 import com.hisanjay.resumebuilderapi.dto.LoginRequest;
 import com.hisanjay.resumebuilderapi.dto.RegisterRequest;
+import com.hisanjay.resumebuilderapi.enums.UploadType;
 import com.hisanjay.resumebuilderapi.service.AuthService;
-import com.hisanjay.resumebuilderapi.service.FileUploadService;
-import com.hisanjay.resumebuilderapi.service.S3FileUploadService;
+import com.hisanjay.resumebuilderapi.service.FileUploaderService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,7 @@ import com.hisanjay.resumebuilderapi.utils.Constants;
 @RequestMapping(Constants.AUTH_ENDPOINT)
 public class AuthController {
     private final AuthService authService;
-    private final FileUploadService fileUploadService;
-    private final S3FileUploadService s3FileUploadService;
+    private final FileUploaderService fileUploaderService;
 
     @PostMapping(Constants.AUTH_REGISTER_ENDPOINT)
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
@@ -94,22 +94,11 @@ public class AuthController {
             throw new IllegalArgumentException("File is required");
         }
 
-        Map<String, String> response;
+        String url = fileUploaderService.upload(
+                uploadFile,
+                UploadType.from(provider));
 
-        switch (provider.toLowerCase()) {
-            case "aws":
-            case "s3":
-                response = Map.of(
-                        "url", s3FileUploadService.upload(uploadFile));
-                break;
-
-            case "cloudinary":
-            default:
-                response = fileUploadService.uploadSingleImage(uploadFile);
-                break;
-        }
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of("url", url));
     }
 
     private MultipartFile resolveUploadFile(MultipartFile image, MultipartFile file) {
