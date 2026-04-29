@@ -16,9 +16,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.hisanjay.resumebuilderapi.security.OAuthAuthenticationEntryPoint;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final OAuthAuthenticationEntryPoint oAuthAuthenticationEntryPoint;
 
     @Value("${app.corsOrigins}")
     private String corsOrigins;
@@ -40,7 +47,9 @@ public class SecurityConfig {
                                 "/api/auth/resend-verification",
                                 "/api/auth/verify-email").permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationEntryPoint(oAuthAuthenticationEntryPoint)
+                        .jwt(Customizer.withDefaults()));
 
         return httpSecurity.build();
     }
