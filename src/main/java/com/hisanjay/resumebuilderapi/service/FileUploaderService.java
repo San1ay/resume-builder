@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.hisanjay.resumebuilderapi.dto.AuthRespone;
 import com.hisanjay.resumebuilderapi.enums.UploadType;
 import com.hisanjay.resumebuilderapi.model.Resume;
 import com.hisanjay.resumebuilderapi.repository.ResumeRepository;
@@ -53,8 +52,8 @@ public class FileUploaderService {
 
     public Map<String, String> uploadResumeImages(String id, Authentication authentication, MultipartFile thumbnail,
             MultipartFile profileImage) throws IOException {
-        AuthRespone response = authService.getProfile(authentication);
-        Resume existingResume = resumeRepository.findByUserIdAndId(response.getId(), id)
+        String userId = authService.getUserId(authentication);
+        Resume existingResume = resumeRepository.findByUserIdAndId(userId, id)
                 .orElseThrow(() -> new RuntimeException("No resume found"));
 
         Map<String, String> returnValue = new HashMap<>();

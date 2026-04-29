@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.hisanjay.resumebuilderapi.dto.AuthRespone;
@@ -59,7 +60,7 @@ public class AuthService {
             throw new RuntimeException("Please Verify Email before logging in.");
         }
 
-        String token = oAuthJwtService.generateToken(existingUser.getEmail());
+        String token = oAuthJwtService.generateToken(existingUser);
         AuthRespone response = toResponse(existingUser);
         response.setToken(token);
         return response;
@@ -143,7 +144,20 @@ public class AuthService {
     }
 
     public AuthRespone getProfile(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String userId = getUserId(authentication);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return toResponse(user);
+    }
+
+    public String getUserId(Authentication authentication) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = jwt.getSubject();
+        // String email=jwt.getClaimAsString("email");
+        if (userId == null || userId.isBlank()) {
+            throw new UsernameNotFoundException("User id not found in token");
+        }
+
+        return userId;
     }
 }

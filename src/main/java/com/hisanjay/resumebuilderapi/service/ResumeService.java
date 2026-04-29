@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import com.hisanjay.resumebuilderapi.dto.AuthRespone;
 import com.hisanjay.resumebuilderapi.dto.CreateResumeRequest;
 import com.hisanjay.resumebuilderapi.model.Resume;
 import com.hisanjay.resumebuilderapi.repository.ResumeRepository;
@@ -21,9 +20,9 @@ public class ResumeService {
     private final AuthService authService;
 
     public Resume createResume(CreateResumeRequest createResumeRequest, Authentication authentication) {
-        AuthRespone authResponse = authService.getProfile(authentication);
+        String userId = authService.getUserId(authentication);
         Resume newResume = Resume.builder()
-                .userId(authResponse.getId())
+                .userId(userId)
                 .title(createResumeRequest.getTitle())
                 .build();
 
@@ -31,21 +30,21 @@ public class ResumeService {
     }
 
     public List<Resume> getUserResumes(Authentication authentication) {
-        AuthRespone authRespone = authService.getProfile(authentication);
-        return resumeRepository.findByUserId(authRespone.getId());
+        String userId = authService.getUserId(authentication);
+        return resumeRepository.findByUserId(userId);
     }
 
     public Resume getResumeById(String resumeId, Authentication authentication) {
-        AuthRespone authRespone = authService.getProfile(authentication);
-        Resume resume = resumeRepository.findByUserIdAndId(authRespone.getId(), resumeId)
+        String userId = authService.getUserId(authentication);
+        Resume resume = resumeRepository.findByUserIdAndId(userId, resumeId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
 
         return resume;
     }
 
     public Resume updateResume(String resumeId, Resume updatedData, Authentication authentication) {
-        AuthRespone authRespone = authService.getProfile(authentication);
-        Resume exsitingResume = resumeRepository.findByUserIdAndId(authRespone.getId(), resumeId)
+        String userId = authService.getUserId(authentication);
+        Resume exsitingResume = resumeRepository.findByUserIdAndId(userId, resumeId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
 
         updateResumeFields(exsitingResume, updatedData);
@@ -92,8 +91,8 @@ public class ResumeService {
     }
 
     public void deleteResume(String resumeId, Authentication authentication) {
-        AuthRespone authRespone = authService.getProfile(authentication);
-        Resume exsitingResume = resumeRepository.findByUserIdAndId(authRespone.getId(), resumeId)
+        String userId = authService.getUserId(authentication);
+        Resume exsitingResume = resumeRepository.findByUserIdAndId(userId, resumeId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
         resumeRepository.delete(exsitingResume);
     }

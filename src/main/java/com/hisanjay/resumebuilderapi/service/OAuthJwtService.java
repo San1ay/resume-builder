@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import com.hisanjay.resumebuilderapi.model.User;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,10 +23,11 @@ public class OAuthJwtService {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(email)
+                .subject(user.getId())
+                .claim("email", user.getEmail())
                 .issuedAt(now)
                 .expiresAt(now.plusMillis(jwtExpiration))
                 .build();
