@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.hisanjay.resumebuilderapi.document.User;
+import com.hisanjay.resumebuilderapi.model.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
 

@@ -9,11 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.hisanjay.resumebuilderapi.document.User;
 import com.hisanjay.resumebuilderapi.dto.AuthRespone;
 import com.hisanjay.resumebuilderapi.dto.LoginRequest;
 import com.hisanjay.resumebuilderapi.dto.RegisterRequest;
 import com.hisanjay.resumebuilderapi.exception.ResourceExistsException;
+import com.hisanjay.resumebuilderapi.model.User;
 import com.hisanjay.resumebuilderapi.repository.UserRepository;
 import com.hisanjay.resumebuilderapi.utils.Jwtutil;
 

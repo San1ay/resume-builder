@@ -1,4 +1,4 @@
-package com.hisanjay.resumebuilderapi.document;
+package com.hisanjay.resumebuilderapi.model;
 
 import java.time.LocalDateTime;
 

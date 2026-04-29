@@ -28,16 +28,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.hisanjay.resumebuilderapi.utils.Constants;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping(Constants.AUTH_ENDPOINT)
 public class AuthController {
     private final AuthService authService;
     private final FileUploadService fileUploadService;
     private final S3FileUploadService s3FileUploadService;
 
-    @PostMapping("/register")
+    @PostMapping(Constants.AUTH_REGISTER_ENDPOINT)
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
         AuthRespone response = authService.register(request);
@@ -45,7 +47,7 @@ public class AuthController {
 
     }
 
-    @PostMapping("/login")
+    @PostMapping(Constants.AUTH_LOGIN_ENDPOINT)
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         AuthRespone respone = authService.login(loginRequest);
         return ResponseEntity.ok(respone);
@@ -56,13 +58,13 @@ public class AuthController {
     // return new String("Token Validation is working");
     // }
 
-    @GetMapping("/profile")
+    @GetMapping(Constants.AUTH_PROFILE_ENDPOINT)
     public ResponseEntity<?> getProfile(Authentication authentication) {
         AuthRespone response = authService.getProfile(authentication);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/resend-verification")
+    @PostMapping(Constants.AUTH_EMAIL_VERIFY_RESEND_ENDPOINT)
     public ResponseEntity<?> resendVerification(@RequestBody Map<String, String> body) {
         String email = body.get("email");
 
@@ -74,13 +76,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Verification Email Sent."));
     }
 
-    @GetMapping("/verify-email")
+    @GetMapping(Constants.AUTH_EMAIL_VERIFY_ENDPOINT)
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {
         authService.verifyEmail(token);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Email verified Sucessfully"));
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = Constants.AUTH_UPLOAD_ENDPOINT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> upload(
             @RequestParam(value = "image", required = false) MultipartFile image,
             @RequestParam(value = "file", required = false) MultipartFile file,
