@@ -15,7 +15,6 @@ import com.hisanjay.resumebuilderapi.dto.RegisterRequest;
 import com.hisanjay.resumebuilderapi.exception.ResourceExistsException;
 import com.hisanjay.resumebuilderapi.model.User;
 import com.hisanjay.resumebuilderapi.repository.UserRepository;
-import com.hisanjay.resumebuilderapi.utils.Jwtutil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-    private final Jwtutil jwtutil;
+    private final OAuthJwtService oAuthJwtService;
 
     @Value("${app.base.url}")
     private String appBaseUrl;
@@ -60,7 +59,7 @@ public class AuthService {
             throw new RuntimeException("Please Verify Email before logging in.");
         }
 
-        String token = jwtutil.generateToken(existingUser.getEmail());
+        String token = oAuthJwtService.generateToken(existingUser.getEmail());
         AuthRespone response = toResponse(existingUser);
         response.setToken(token);
         return response;
