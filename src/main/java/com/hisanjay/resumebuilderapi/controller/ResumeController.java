@@ -25,7 +25,6 @@ import com.hisanjay.resumebuilderapi.service.FileUploaderService;
 import com.hisanjay.resumebuilderapi.service.ResumeService;
 import com.hisanjay.resumebuilderapi.utils.Constants;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(Constants.RESUME_ENDPOINT)
 @RequiredArgsConstructor
 @Slf4j
-public class ResumeController {
+public class ResumeController implements ResumeControllerSpec {
     private final ResumeService resumeService;
     private final FileUploaderService fileUploaderService;
 
@@ -71,7 +70,7 @@ public class ResumeController {
     public ResponseEntity<?> uploadResumeImage(@PathVariable String id,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-            HttpServletRequest request, Authentication authentication) throws IOException {
+            Authentication authentication) throws IOException {
         Map<String, String> response = fileUploaderService.uploadResumeImages(id, authentication, thumbnail,
                 profileImage);
         return ResponseEntity.ok(response);
@@ -84,4 +83,5 @@ public class ResumeController {
         return ResponseEntity.ok(Map.of("message", "Resume Deleted Successfully"));
 
     }
+
 }

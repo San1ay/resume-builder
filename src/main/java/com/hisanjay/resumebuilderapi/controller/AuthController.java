@@ -35,7 +35,7 @@ import com.hisanjay.resumebuilderapi.utils.Constants;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(Constants.AUTH_ENDPOINT)
-public class AuthController {
+public class AuthController implements AuthControllerSpec {
     private final AuthService authService;
     private final FileUploaderService fileUploaderService;
 
