@@ -22,10 +22,13 @@ public class Constants {
     public final String TEMPLATE_ENDPOINT = "/api/templates";
 
     // PAYMENT
-    public final String PAYMENT_ENPOINT = "/api/payment";
+    public final String PAYMENT_ENDPOINT = "/api/payment";
     public final String PAYMENT_CREATE_ORDER_ENDPOINT = "/create-order";
     public final String PAYMENT_VERIFY_ENDPOINT = "/verify";
     public final String PAYMENT_HISTORY_ENDPOINT = "/history";
     public final String PAYMENT_GET_ORDER_ENDPOINT = "/order/{orderId}";
+
+    // EMAIL
+    public final String EMAIL_ENDPOINT = "/api/email";
 
 }

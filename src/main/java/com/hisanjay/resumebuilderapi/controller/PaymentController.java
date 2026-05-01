@@ -24,7 +24,7 @@ import com.razorpay.RazorpayException;
 
 import jakarta.validation.Valid;
 
-@RequestMapping(Constants.PAYMENT_ENPOINT)
+@RequestMapping(Constants.PAYMENT_ENDPOINT)
 @RestController
 @Slf4j
 @RequiredArgsConstructor
