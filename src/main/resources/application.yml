@@ -34,3 +34,6 @@ aws:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
+razorpay:
+  key: ${RAZORPAY_API_KEY}
+  secret: ${RAZORPAY_API_SECRET}
